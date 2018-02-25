@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.menglingqiang.schedule.dao.UserDao">
+
+	<select id="queryAllUser" resultType="com.menglingqiang.schedule.entity.User">
+		select user_id,name,password,email,code,status,create_time
+		from user
+	</select>
+    <select id="queryByCode" parameterType="string" resultType="com.menglingqiang.schedule.entity.User">
+    	select user_id,name,password,email,code,status,create_time
+    	from user where code=#{code}
+    </select>
+    
+    <select id="queryByPassword" parameterType="com.menglingqiang.schedule.entity.User" resultType="com.menglingqiang.schedule.entity.User">
+    	select user_id,name,password,email,code,status,create_time
+    	from user where email = #{email} and password = #{password}
+    </select>
+    
+     <select id="queryByEmail" parameterType="com.menglingqiang.schedule.entity.User" resultType="com.menglingqiang.schedule.entity.User">
+    	select *
+    	from user where email = #{email}
+    </select>
+	
+	<insert id="register" parameterType="com.menglingqiang.schedule.entity.User" >
+	
+		INSERT INTO user(name, password, email, code, status, create_time,user_pic) 
+		VALUES(#{name}, #{password}, #{email}, #{code}, 0, #{createTime},'userdefault.jpg')
+	</insert>
+	
+	<update id="UpdateUserByCode" parameterType="string">
+		UPDATE user 
+		SET  status=1
+		,code = null
+		where code = #{code}
+	</update>
+	
+	<update id="updateUser" parameterType="com.menglingqiang.schedule.entity.User">
+		UPDATE user 
+		<set>
+
+	        <if test="password!=null and !&quot;&quot;.equals(password.trim())">
+	  			password=#{password},
+		    </if>
+		    <if test="name!=null and !&quot;&quot;.equals(name.trim())">
+	  			name=#{name},
+		    </if>
+		    <if test="userPic!=null and !&quot;&quot;.equals(userPic.trim())">
+	  			user_pic=#{userPic},
+	    	</if>
+			
+        </set>
+		where email = #{email}
+	</update>
+	<!-- 通过userid插入第三方登录信息 -->
+	<insert id="registerByThree" parameterType="java.util.HashMap" >
+		INSERT INTO user(name,password ,status, create_time,login_type) 
+			VALUES(#{userName}, #{password},1, #{createTime},#{loginType})
+	</insert>
+	<!-- 通过userid更新第三方登录信息 -->
+	<update id="updateUserByUserIdForThree" parameterType="java.util.HashMap">
+		UPDATE user 
+		<set>
+	        <if test="password!=null and !&quot;&quot;.equals(password.trim())">
+	  			password=#{password},
+		    </if>
+		    
+		    <if test="userPic!=null and !&quot;&quot;.equals(userPic.trim())">
+	  			user_pic=#{userPic},
+	    	</if>
+			<if test="email!=null and !&quot;&quot;.equals(email.trim())">
+	  			email=#{email},
+	    	</if>
+	    	<if test="tempToken!=null and !&quot;&quot;.equals(tempToken.trim())">
+	  			temp_token=#{tempToken},
+	    	</if>
+        </set>
+		where user_id = #{userId} and login_type=#{loginType}
+	</update>
+	<select id="queryUserByThree" parameterType="java.util.HashMap" resultType="com.menglingqiang.schedule.entity.User">
+		select * from user
+		where name=#{userName} and login_type=#{loginType}
+	</select>
+</mapper>
+

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.menglingqiang.schedule.dao.ProjectDao">
+
+	<resultMap type="com.menglingqiang.schedule.entity.Project" id="projectResultMap">  
+        <id column="project_id" property="projectId"/>  
+        <result column="project_name" property="projectName"/>  
+        <result column="start_time" property="startTime"/>  
+        <result column="end_time" property="endTime"/>  
+        <result column="modify" property="modify"/>  
+        <result column="email" property="email"/>  
+        <collection property="detailProjects" ofType="com.menglingqiang.schedule.entity.DetailProject">  
+            <id column="project_detail_id" property="projectDetailId"/>  
+	        <result column="project_detail_name" property="projectDetailName"/>  
+	        <result column="detail_start_time" property="detailStartTime"/>  
+	        <result column="detail_end_time" property="detailEndTime"/>  
+	        <result column="done" property="done"/>  
+        </collection>  
+          
+    </resultMap> 
+    <select id="queryAllProject" resultMap="projectResultMap">
+    	select * from user_info 
+    </select>
+    <select id="queryEverything" parameterType="java.util.HashMap" resultMap="projectResultMap">
+    	select * from user_info
+    	where 1=1
+    	<choose>
+			<when test="projectId!=null and projectId!=''">
+				and project_id = #{projectId}
+			</when>
+			<when test="projectName!=null and projectName!=''">
+				and project_name = #{projectName}
+			</when>
+			<when test="email!=null and email!=''">
+				and email = #{email}
+			</when>
+		</choose>
+    </select>
+    
+	<select id="queryProjectByEmail" parameterType="string" resultMap="projectResultMap">
+		select project_id,email,project_name,start_time,end_time,modify
+		from user_info
+		where email=#{email}
+	</select>
+	
+	<select id="queryDetailProjectById" parameterType="java.lang.Long" resultMap="projectResultMap">
+		select u.*,d.*
+		from user_info as u ,user_detail_info as d
+		where u.project_id = d.project_id
+		and u.project_id=#{projectId}
+	</select>
+	
+	<insert id="insertProjectByUser" >
+	
+		INSERT INTO user_info
+		(email, project_name, start_time, end_time) 
+			VALUES
+		(#{user.email}, #{project.projectName}, #{project.startTime}, #{project.endTime})
+	</insert>
+	<insert id="insertProjectByEmail" >
+	
+		INSERT INTO user_info
+		(email, project_name, start_time, end_time) 
+			VALUES
+		(#{project.email}, #{project.projectName}, #{project.startTime}, #{project.endTime})
+	</insert>
+	
+	<update id="modifyProject" parameterType="com.menglingqiang.schedule.entity.Project">
+		update user_info
+		set project_name=#{projectName},
+		start_time=#{startTime},end_time=#{endTime},
+		modify = modify+1
+		where project_id=#{projectId}
+	</update>
+	
+	<delete id="deleteProject" parameterType="java.lang.Long" >  
+		DELETE
+			
+		FROM
+			user_info
+		WHERE
+			project_id=#{projectId}
+		
+	</delete>
+	<select id="haveDone" parameterType="java.lang.Long" resultType="java.lang.Float">
+		SELECT
+		TRUNCATE(b.finished/a.allProject,2) from 
+		(	SELECT
+				case COUNT(*) when 0 then 1 else COUNT(*) end as allProject
+			FROM
+				user_detail_info AS d ,
+				user_info         AS u 
+			WHERE
+				u.project_id = d.project_id AND
+				u.project_id=#{projectId})as a
+		,
+		(	SELECT
+				COUNT(*) as finished 
+			FROM
+				user_detail_info 
+			WHERE
+				project_id=#{projectId} AND
+				done=1) as  b
+	</select>
+	
+	<select id="queryProjectByNameOrTime" parameterType="java.util.HashMap"  resultMap="projectResultMap">
+		SELECT
+			* 
+		FROM
+			user_info 
+		WHERE email = #{email}
+		<if test="projectName!=null and !&quot;&quot;.equals(projectName.trim())">
+  			AND project_name LIKE CONCAT('%',#{projectName},'%')
+	    </if>
+	    <if test="queryTime!=null and !&quot;&quot;.equals(queryTime.trim())">
+  			AND #{queryTime} BETWEEN left(start_time,10) AND left(end_time,10)
+		</if>
+			
+	</select>
+	
+	<select id="queryAllDetailProjectCountByEmail" parameterType="java.lang.String" resultType="java.lang.Integer">
+		SELECT
+			COUNT(d.project_detail_id) 
+		FROM
+			USER            AS u ,
+			user_info       AS i,
+			user_detail_info AS d 
+		WHERE
+			u.email = i.email AND
+			i.project_id = d.project_id
+			and u.email=#{email}
+	</select>
+	
+	<select id="queryAllDoneDetailProjectCountByEmail" parameterType="java.lang.String" resultType="java.lang.Integer">
+		SELECT
+			COUNT(d.project_detail_id) 
+		FROM
+			USER            AS u ,
+			user_info       AS i,
+			user_detail_info AS d 
+		WHERE
+			u.email = i.email AND
+			i.project_id = d.project_id
+            AND d.done=1 and u.email=#{email}
+	</select>
+	
+	<select id="queryMessage" parameterType="java.lang.String" resultType="java.util.HashMap">
+		SELECT
+			d.project_detail_name,u.project_name 
+		FROM
+			user_detail_info AS d,
+			user_info        AS u 
+		WHERE
+			u.email=#{email} AND
+			u.project_id=d.project_id AND
+			now() BETWEEN d.detail_start_time AND
+			DATE_ADD(d.detail_end_time,INTERVAL 1 DAY)  
+	</select>
+	
+</mapper>
+

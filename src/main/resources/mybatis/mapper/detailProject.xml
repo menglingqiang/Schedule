@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.menglingqiang.schedule.dao.DetailProjectDao">
+
+	<resultMap type="com.menglingqiang.schedule.entity.DetailProject" id="detailProjectResultMap">  
+        <id column="project_detail_id" property="projectDetailId"/>  
+        <result column="project_detail_name" property="projectDetailName"/>  
+        <result column="detail_start_time" property="detailStartTime"/>  
+        <result column="detail_end_time" property="detailEndTime"/>  
+        <result column="detail_modify" property="detailModify"/>  
+        <result column="done" property="done"/>  
+        <association property="project" javaType="com.menglingqiang.schedule.entity.Project">  
+            <id column="project_id" property="projectId"/>  
+	        <result column="project_name" property="projectName"/>  
+	        <result column="start_time" property="startTime"/>  
+	        <result column="end_time" property="endTime"/>  
+	        <result column="modify" property="modify"/>    
+        </association> 
+    </resultMap> 
+    
+    <select id="queryAllDetailProject" resultMap="detailProjectResultMap">
+    	select *
+    	from user_detail_info
+    </select>
+    
+    <insert id="addDetailProject" parameterType="com.menglingqiang.schedule.entity.DetailProject">
+    	INSERT INTO user_detail_info
+    	(project_id, project_detail_name, detail_start_time, detail_end_time) 
+		VALUES(#{projectId}, #{projectDetailName},#{detailStartTime} ,#{detailEndTime} )
+    </insert>
+    
+    <delete id="deteleDetailProject" parameterType="java.lang.Long">
+    	delete from user_detail_info
+    	where project_detail_id=#{projectDetailId}
+    </delete>
+    
+    <!-- 后期换成动态sql -->
+    <update id="modifyDetailProject" parameterType="com.menglingqiang.schedule.entity.DetailProject">
+    	update user_detail_info
+    	set project_detail_name=#{projectDetailName},detail_start_time=#{detailStartTime},
+    	detail_end_time=#{detailEndTime},detail_modify = detail_modify+1
+    	where project_detail_id=#{projectDetailId}
+    </update>
+    
+    <update id="modifyDetailProjectForDone" parameterType="java.lang.Long">
+    	update user_detail_info
+    	set done=1
+    	where project_detail_id=#{projectDetailId}
+    </update>
+    <select id="queryDetailProjectByNameOrTime" parameterType="java.util.HashMap"  resultMap="detailProjectResultMap">
+		SELECT
+			* 
+		FROM
+			user_detail_info 
+		WHERE project_id=#{projectId}
+		<if test="detailProjectName!=null and !&quot;&quot;.equals(detailProjectName.trim())">
+ 			AND project_detail_name LIKE CONCAT('%',#{detailProjectName},'%')
+	    </if>
+	    <if test="queryTime!=null and !&quot;&quot;.equals(queryTime.trim())">
+  			AND #{queryTime} BETWEEN left(detail_start_time,10) AND
+			left(detail_end_time,10)
+		</if>
+	</select>
+	
+	<resultMap type="com.menglingqiang.schedule.entity.Project" id="projectResultMap">  
+        <id column="project_id" property="projectId"/>  
+        <result column="project_name" property="projectName"/>  
+        <result column="start_time" property="startTime"/>  
+        <result column="end_time" property="endTime"/>  
+        <result column="modify" property="modify"/>  
+        <result column="email" property="email"/>  
+        <collection property="detailProjects" ofType="com.menglingqiang.schedule.entity.DetailProject">  
+            <id column="project_detail_id" property="projectDetailId"/>  
+	        <result column="project_detail_name" property="projectDetailName"/>  
+	        <result column="detail_start_time" property="detailStartTime"/>  
+	        <result column="detail_end_time" property="detailEndTime"/>  
+	        <result column="done" property="done"/>  
+        </collection>  
+          
+    </resultMap>
+    
+     <!-- 查询今天所有正在进行的总项目 -->
+	 <select id="queryPojectMessage" parameterType="java.lang.String"  resultMap="projectResultMap">
+		SELECT
+			* 
+		FROM
+			user_info 
+		WHERE
+			email=#email# AND
+			now() BETWEEN start_time AND
+			end_time
+	</select>
+	
+	<!-- 查询今天所有正在进行的分项目 -->
+	<select id="queryDetailPojectMessage" parameterType="java.lang.String"  resultMap="detailProjectResultMap">
+		SELECT
+			d.* 
+		FROM
+			user_detail_info AS d,
+			user_info        AS u 
+		WHERE
+			u.email=#email# AND
+			u.project_id=d.project_id AND
+			now() BETWEEN d.detail_start_time AND
+			d.detail_end_time 
+	</select>
+	
+</mapper>
+
