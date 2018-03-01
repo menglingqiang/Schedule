@@ -112,5 +112,11 @@ public class ProjectServiceImp implements ProjectService{
 		}
 		return messages;
 	}
+
+	@Override
+	public int updateProjectForEmailChange(Map map) {
+		
+		return projectDao.updateProjectForEmailChange(map);
+	}
 	
 }

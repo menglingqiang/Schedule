@@ -42,7 +42,7 @@ public class ProjectController {
 	@Autowired
 	DetailProjectService detailProjectService;
 	
-    @RequestMapping(value="/operation",method=RequestMethod.POST)
+    @RequestMapping(value="/operation",method={RequestMethod.GET,RequestMethod.POST})
 	public String operation(HttpServletRequest request,Model model)
 	{
     	String type = request.getParameter("type").trim();
@@ -86,14 +86,14 @@ public class ProjectController {
     	//重新查一次数据放入页面中
     	return "fucktime/projectList";
 	}
-    @RequestMapping(value="/showDetail",method=RequestMethod.POST)//可以将里面的内容抽象为函数
+    @RequestMapping(value="/showDetail",method={RequestMethod.GET,RequestMethod.POST})//可以将里面的内容抽象为函数
     public String showDetail(HttpServletRequest request,Model model)
     {
     	String projectId = request.getParameter("projectId");
     	String projectName = request.getParameter("projectName");
     	return showInfo(projectId,projectName,model);
     }
-    @RequestMapping(value="/detailOperation",method=RequestMethod.POST)
+    @RequestMapping(value="/detailOperation",method={RequestMethod.GET,RequestMethod.POST})
 	public String detailOperation(HttpServletRequest request,Model model)
 	{
     	String type = request.getParameter("type").trim();
@@ -134,7 +134,7 @@ public class ProjectController {
 		}
     	return showInfo(projectId,name,model);
 	}
-    @RequestMapping(value="/doneDetailProject",method=RequestMethod.POST)
+    @RequestMapping(value="/doneDetailProject",method={RequestMethod.GET,RequestMethod.POST})
     public String doneDetailProject(HttpServletRequest request,Model model)
     {
     	String detailProjectId = request.getParameter("detailProjectId");
@@ -153,7 +153,7 @@ public class ProjectController {
     	model.addAttribute("projectName",projectName);
     	return "fucktime/detailProjectList";
     }
-    @RequestMapping(value="/getProjectByEmail",method=RequestMethod.POST)
+    @RequestMapping(value="/getProjectByEmail",method={RequestMethod.GET,RequestMethod.POST})
     public String getDetailProject(HttpServletRequest request,Model model)
     {
     	String projectId = request.getParameter("projectId");
@@ -177,7 +177,7 @@ public class ProjectController {
     	return "fucktime/projectList";
     }
     //得到完成的百分比
-    @RequestMapping(value="/getHaveDone",method=RequestMethod.GET)
+    @RequestMapping(value="/getHaveDone",method={RequestMethod.GET,RequestMethod.POST})
     public  @ResponseBody String getHaveDone(HttpServletRequest request,HttpServletResponse response,Model model)
     {
     	HashMap<String,Float> map = new HashMap<String,Float>();//key是项目的id,value是项目的完成百分比
@@ -195,7 +195,7 @@ public class ProjectController {
     	return map.toString();
     	//return "success";
     }
-    @RequestMapping(value="/queryProjectByNameOrTime",method=RequestMethod.POST)
+    @RequestMapping(value="/queryProjectByNameOrTime",method={RequestMethod.GET,RequestMethod.POST})
     public  String queryProjectByNameOrTime(HttpServletRequest request,Model model)
     {
     	String projectName = (String)UUIDUtil.parseNull2Empty(request.getParameter("queryProjectName"));
@@ -218,7 +218,7 @@ public class ProjectController {
     	//重新查一次数据放入页面中
     	return "fucktime/projectList";
     }
-    @RequestMapping(value="/queryDetailProjectByNameOrTime",method=RequestMethod.POST)
+    @RequestMapping(value="/queryDetailProjectByNameOrTime",method={RequestMethod.GET,RequestMethod.POST})
     public  String queryDetailProjectByNameOrTime(HttpServletRequest request,Model model)
     {
     	String detailProjectName = request.getParameter("queryDetailProjectName");
@@ -237,7 +237,7 @@ public class ProjectController {
     	model.addAttribute("projectName",projectName);
     	return "fucktime/detailProjectList";
     }
-    @RequestMapping(value="/queryUserName",method=RequestMethod.GET,produces={"application/text;charset=UTF-8"})
+    @RequestMapping(value="/queryUserName",method={RequestMethod.GET,RequestMethod.POST},produces={"application/text;charset=UTF-8"})
     public  @ResponseBody String queryUserName(HttpServletRequest request)
     {
     	String email = request.getParameter("email");
@@ -252,7 +252,7 @@ public class ProjectController {
      * @param request
      * @return
      */
-    @RequestMapping(value="/queryPorjectNameAndTime",method=RequestMethod.GET,produces={"application/text;charset=UTF-8"})
+    @RequestMapping(value="/queryPorjectNameAndTime",method={RequestMethod.GET,RequestMethod.POST},produces={"application/text;charset=UTF-8"})
     public  @ResponseBody String queryPorjectNameAndTime(HttpServletRequest request)
     {
     	
@@ -265,7 +265,7 @@ public class ProjectController {
     	return projectList.get(0).getProjectName()+","+projectList.get(0).getStartDate()+","+
     	projectList.get(0).getEndDate();
     }
-    @RequestMapping(value="queryMessage",method=RequestMethod.POST)
+    @RequestMapping(value="queryMessage",method={RequestMethod.GET,RequestMethod.POST})
     public String queryMessage(HttpServletRequest request,Model model)
     {
     	String email = request.getParameter("email");
@@ -280,7 +280,7 @@ public class ProjectController {
     	return "user/message";
     }
     //微博分享
-    @RequestMapping(value="/shareWeiBo",method=RequestMethod.POST)
+    @RequestMapping(value="/shareWeiBo",method={RequestMethod.GET,RequestMethod.POST})
     public  @ResponseBody String shareWeiBo(HttpServletRequest request)
     {
     	String email = request.getParameter("email");
@@ -298,7 +298,7 @@ public class ProjectController {
 		}	
     	return "success";
     }
-    @RequestMapping(value="/test",method=RequestMethod.GET)
+    @RequestMapping(value="/test",method={RequestMethod.GET,RequestMethod.POST})
     public  String test(HttpServletRequest request,HttpServletResponse response,Model model)
     {
     	return "user/test";

@@ -42,7 +42,22 @@ String ico = Constant.WEBICO;
 			alert("请检查一下文件的后缀名是否是jpg等图片格式");
 		}
 	}
-	
+	function changeEmail(email)
+	{
+		var newEmail = document.getElementById("newEmail").value;
+		if(!isEmail(email)||!isEmail(newEmail))
+			alert("邮箱格式不正确，请查看后重新提交");
+		else
+		{
+			var form = document.getElementById("form1");
+			form.action="<%=basePath %>user/changeEmail?email="+email+"&newEmail="+newEmail;
+			form.submit();
+		}
+	}
+	function isEmail(str){
+        var reg = /^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$/;
+        return reg.test(str);
+    }
     function PreviewImage(obj, imgPreviewId, divPreviewId) {  
     	var extend=obj.value.substring(obj.value.lastIndexOf(".") + 1);
 		var msg = document.getElementById("message");
@@ -114,6 +129,8 @@ String ico = Constant.WEBICO;
 	        <li>
 	            <span>
 	               	邮箱 :${user.email}
+	               <input type="newEmail" id="newEmail" name="newEmail" placeholder="新绑定邮 箱"/>
+	               <input type="button" value="提交" onclick="javascript:changeEmail('${user.email}')"></input>
 	            </span>
 	        </li>
 	        <li>
@@ -126,7 +143,11 @@ String ico = Constant.WEBICO;
 	                	已完成任务量 :${done}
 	            </span>
 	        </li>
-	       
+	       <li>
+	            <span>
+	                	${msg}
+	            </span>
+	        </li>
 	        <li>
 	             <a href="javascript:returnProject()">
 	                	返回总任务界面

@@ -29,7 +29,7 @@ public class UserServiceImp implements UserService{
 
 	@Override
 	public int UpdateUserCode(String code) {
-		int temp = userDao.UpdateUserByCode(code);
+		int temp = userDao.updateUserByCode(code);
 		return temp;
 	}
 
@@ -75,5 +75,14 @@ public class UserServiceImp implements UserService{
 		
 		return userDao.queryUserByThree(map);
 	}
-	
+
+	@Override
+	public int changeEmail(Map map) {
+		return userDao.changeEmail(map);
+	}
+	@Override
+	public int updateUserEmail(Map map)
+	{
+		return userDao.updateUserEmail(map);
+	}
 }

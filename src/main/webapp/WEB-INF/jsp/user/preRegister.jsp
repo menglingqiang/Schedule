@@ -15,7 +15,17 @@ String ico = Constant.WEBICO;
     <link rel="icon" href="/schedule/img/<%=ico%>/" type="image/x-icon" />
     <script src="/schedule/script/jquery-1.8.0.min.js"></script>
     <script type="text/javascript">
-   
+    function initLink()
+    {
+	    host = window.location.host;
+	    var weiboNet = document.getElementById("weiboNet");
+	    var weiboLocal = document.getElementById("weiboLocal");
+	    if(host.indexOf("www")==1)
+	    	weiboLocal.style.display="none";
+	    else
+	    	weiboNet.style.display="none";
+	    
+    }
   	function reloadImageCode()
   	{
   		var date = new Date();//不传入一个date的话浏览器认为这个请求是没有必要的，不会刷新页面
@@ -61,6 +71,7 @@ String ico = Constant.WEBICO;
   	window.onload = function(){
   		reloadImageCode();
   		checkInputCode();
+  		initLink();
   	}
   	function preRegister()
   	{
@@ -112,9 +123,8 @@ String ico = Constant.WEBICO;
          return reg.test(str);
      }
   	function isPassword(str){
-       /*  var reg =  /^[a-zA-Z]{8,16}$/;
-        return reg.test(str); */
-        return true;
+        var reg =  /(?=.*\d)(?=.*[A-z])^[0-9A-z]{8,}$/;
+        return reg.test(str);
     }
   </script>
 </head>
@@ -165,7 +175,9 @@ String ico = Constant.WEBICO;
         	<div class="bj_right">
             	<p>使用以下账号直接登录</p>
                 <a href="#" class="zhuce_qq">QQ登陆</a>
-                <a href="<%=basePath %>user/loginByWeiBo" class="zhuce_wb">微博登陆</a>
+  				<a id="weiboNet" href="https://api.weibo.com/oauth2/authorize?client_id=3566366953&response_type=code&redirect_uri=http://www.menglingqiang.com/schedule/user/registerByThree?loginType=2" class="zhuce_wb">微博登录</a>
+              	<a id="weiboLocal" href="https://api.weibo.com/oauth2/authorize?client_id=1179732476&response_type=code&redirect_uri=http://127.0.0.1:8080/schedule/user/registerByThree?loginType=2" class="zhuce_wb">微博本地</a>
+               <%--  <a href="<%=basePath %>user/loginByWeiBo" class="zhuce_wb">微博登陆</a> --%>
                 <a href="#" class="zhuce_wx">微信登陆</a>
                 <p>已有账号？<a href="<%=basePath %>user/preLogin">立即登录</a></p>
             

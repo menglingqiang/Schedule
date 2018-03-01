@@ -29,13 +29,19 @@
 		VALUES(#{name}, #{password}, #{email}, #{code}, 0, #{createTime},'userdefault.jpg')
 	</insert>
 	
-	<update id="UpdateUserByCode" parameterType="string">
+	<update id="updateUserByCode" parameterType="string">
 		UPDATE user 
 		SET  status=1
 		,code = null
 		where code = #{code}
 	</update>
-	
+	<update id="updateUserEmail" parameterType="java.util.HashMap">
+		UPDATE user 
+		SET  status=1
+		,code = null,
+		email=#{newEmail}
+		where email=#{email}
+	</update>
 	<update id="updateUser" parameterType="com.menglingqiang.schedule.entity.User">
 		UPDATE user 
 		<set>
@@ -49,14 +55,16 @@
 		    <if test="userPic!=null and !&quot;&quot;.equals(userPic.trim())">
 	  			user_pic=#{userPic},
 	    	</if>
-			
+			<if test="code!=null and !&quot;&quot;.equals(code.trim())">
+	  			code=#{code},
+		    </if>
         </set>
 		where email = #{email}
 	</update>
 	<!-- 通过userid插入第三方登录信息 -->
 	<insert id="registerByThree" parameterType="java.util.HashMap" >
 		INSERT INTO user(name,password ,status, create_time,login_type) 
-			VALUES(#{userName}, #{password},1, #{createTime},#{loginType})
+			VALUES(#{userName}, #{password},0, #{createTime},#{loginType})
 	</insert>
 	<!-- 通过userid更新第三方登录信息 -->
 	<update id="updateUserByUserIdForThree" parameterType="java.util.HashMap">
@@ -82,5 +90,9 @@
 		select * from user
 		where name=#{userName} and login_type=#{loginType}
 	</select>
+	<update id="changeEmail" parameterType="java.util.HashMap">
+		update user set email =#{newEmail}
+		where email =#{email}
+	</update>
 </mapper>
 

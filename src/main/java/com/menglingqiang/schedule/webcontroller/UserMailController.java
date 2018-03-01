@@ -16,7 +16,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.connector.Request;
 import org.apache.commons.io.FileUtils;
+import org.apache.ibatis.lang.UsesJava7;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,21 +55,21 @@ public class UserMailController {
 	ProjectService projectService;
     
 	//欢迎页面
-	@RequestMapping(value="/",method=RequestMethod.GET)
+	@RequestMapping(value="/",method={RequestMethod.GET,RequestMethod.POST})
 	public String welcome()
 	{
 		return "user/preLogin";//欢迎界面
 	}
 	
 	//进入注册页面
-	@RequestMapping(value="/preRegister",method=RequestMethod.GET)
+	@RequestMapping(value="/preRegister",method={RequestMethod.GET,RequestMethod.POST})
 	public String preRegister()
 	{
 		return "user/preRegister";
 	}
 	//进入注册状态页面
 	@Transactional
-	@RequestMapping(value="/register",method=RequestMethod.POST)
+	@RequestMapping(value="/register",method={RequestMethod.GET,RequestMethod.POST})
 	public String register(HttpServletRequest request,Model model,User user)
 	{
 		if(userService.isRegister(user))//判断是否已经有注册信息
@@ -91,7 +93,7 @@ public class UserMailController {
 		}
 	}
 	@Transactional
-	@RequestMapping(value="/registerByThree")
+	@RequestMapping(value="/registerByThree",method={RequestMethod.GET,RequestMethod.POST})
 	public String registerByThree(HttpServletRequest request,HttpServletResponse response,Model model)
 	{
 		String loginType = request.getParameter("loginType");
@@ -186,8 +188,9 @@ public class UserMailController {
 	 * 如果是第一次注册
 	 */
 	//进入激活状态页面
-	@RequestMapping(value="/activation",method=RequestMethod.GET)
-	public String activation(Model model ,String  code,boolean flag)//true表示第一次注册
+	@Transactional
+	@RequestMapping(value="/activation",method={RequestMethod.GET,RequestMethod.POST})
+	public String activation(Model model ,String  code,boolean flag,HttpServletRequest requset)//true表示第一次注册
 	{
 		if(code==null)
 			return "user/activition-error";
@@ -202,6 +205,19 @@ public class UserMailController {
 			else
 			{
 				userService.UpdateUserCode(code);//根据激活码更新用户的状态
+				String email = requset.getParameter("email");
+				String newEmail = requset.getParameter("newEmail");
+				if(email!=null && newEmail!=null)
+				{
+					Map temp = new HashMap();
+					temp.put("email", email);
+					temp.put("newEmail", newEmail);
+					//如果是更改邮箱激活的话,更新用户邮箱
+					userService.updateUserEmail(temp);
+					//更新总任务对应的邮箱
+					projectService.updateProjectForEmailChange(temp);
+					user.setEmail(newEmail);
+				}
 				Project p = UUIDUtil.genProject(user.getEmail());
 				projectService.insertProjectByUser(user, p);//激活用户系统自动添加一项任务
 				user.setStatus(1);
@@ -215,13 +231,13 @@ public class UserMailController {
 		}
 	}
 	//进入登录界面
-	@RequestMapping(value="/preLogin",method=RequestMethod.GET)
+	@RequestMapping(value="/preLogin",method={RequestMethod.GET,RequestMethod.POST})
 	public String preLogin(HttpServletRequest request,HttpServletResponse response)
 	{
 		return "user/preLogin";//登录界面
 	}
 	//微博登录
-	@RequestMapping(value="/loginByWeiBo",method=RequestMethod.GET)
+	@RequestMapping(value="/loginByWeiBo",method={RequestMethod.GET,RequestMethod.POST})
 	public void loginByWeibo(HttpServletRequest request,HttpServletResponse response)
 	{
 		System.setProperty("java.awt.headless", "false");
@@ -234,7 +250,7 @@ public class UserMailController {
 		}
 	}
 	//执行登录逻辑
-	@RequestMapping(value="/login",method=RequestMethod.POST)
+	@RequestMapping(value="/login",method={RequestMethod.GET,RequestMethod.POST})
 	public String logIn(User user,Model model,HttpServletRequest request,HttpServletResponse response) throws IOException
 	{
 		//验证验证码是否输入正确	
@@ -285,7 +301,7 @@ public class UserMailController {
 					}
 				}
 				//判断完毕
-				if(userTemp.getStatus()==0)//没有激活
+				if(userTemp.getStatus()==0 && userTemp.getLoginType().equals("1"))//邮箱用户没有激活先激活才可以用打卡的功能
 					return "user/login-success";
 				else
 				{
@@ -298,7 +314,7 @@ public class UserMailController {
 		return "user/login-error";
 	}
 	//生成验证码
-	@RequestMapping(value="/validate",method=RequestMethod.GET)
+	@RequestMapping(value="/validate",method={RequestMethod.GET,RequestMethod.POST})
 	public void gerValidate(HttpServletRequest request,HttpServletResponse response) throws IOException
 	{
 		//画验证码的框
@@ -335,21 +351,21 @@ public class UserMailController {
 		return flag;
 	}
 
-	@RequestMapping(value="/getPicCode",method=RequestMethod.GET)
+	@RequestMapping(value="/getPicCode",method={RequestMethod.GET,RequestMethod.POST})
 	public  @ResponseBody String getPicCode(HttpServletRequest request)
 	{
 		String picCode = (String)request.getSession().getAttribute("picCode");
 		return picCode;
 	}
 	//进入忘记密码界面
-	@RequestMapping(value="/preForgetPassword",method=RequestMethod.GET)
+	@RequestMapping(value="/preForgetPassword",method={RequestMethod.GET,RequestMethod.POST})
 	public String preForgetPassword()
 	{
 		return "user/preForgetPassword";
 	}
 	
 	//忘记密码逻辑,通过邮箱查找用户
-	@RequestMapping(value="/forgetPassword",method=RequestMethod.POST)
+	@RequestMapping(value="/forgetPassword",method={RequestMethod.GET,RequestMethod.POST})
 	public String forgetPassword(User user,HttpServletRequest request)//前台会自动的将email注入到user中
 	{
 		String email = (String)request.getParameter("email");
@@ -362,7 +378,7 @@ public class UserMailController {
 		request.getSession().setAttribute("msg", "邮件已经发送到您的邮箱，请查收");
 		return "user/confrimForgetPassword";
 	}
-	@RequestMapping(value="/isRegister",method=RequestMethod.GET)
+	@RequestMapping(value="/isRegister",method={RequestMethod.GET,RequestMethod.POST})
 	public @ResponseBody String isRegister(HttpServletRequest request)//前台会自动的将email注入到user中
 	{
 		String email = (String)request.getParameter("email");
@@ -373,7 +389,7 @@ public class UserMailController {
 		return flag;
 	}
 	//进入用户信息修改界面
-	@RequestMapping(value="/modifyPassword",method=RequestMethod.GET)
+	@RequestMapping(value="/modifyPassword",method={RequestMethod.GET,RequestMethod.POST})
 	public String modifyPassword(HttpServletRequest request,Model model)//修改用户的信息,就不用激活了，保持原来账户的信息
 	{
 		String email = (String)request.getParameter("email");
@@ -400,7 +416,7 @@ public class UserMailController {
 			}
 		}
 	}
-	@RequestMapping(value="/loginFlag",method=RequestMethod.GET)
+	@RequestMapping(value="/loginFlag",method={RequestMethod.GET,RequestMethod.POST})
 	public @ResponseBody String loginFlag(HttpServletRequest request,HttpServletResponse response) throws IOException
 	{
 		//1验证成功，2这个邮箱木有注册，3有邮箱但是密码不对，4验证码不对
@@ -418,7 +434,7 @@ public class UserMailController {
 			return "3";
 		return "1";
 	}
-	@RequestMapping(value="/registerFlag",method=RequestMethod.GET)
+	@RequestMapping(value="/registerFlag",method={RequestMethod.GET,RequestMethod.POST})
 	public @ResponseBody String registerFlag(HttpServletRequest request,HttpServletResponse response) throws IOException
 	{
 		//1,邮箱已经注册，0，邮箱没有注册
@@ -431,7 +447,7 @@ public class UserMailController {
 		else
 			return "1";
 	}
-	@RequestMapping(value="/showUserInfo",method=RequestMethod.POST)
+	@RequestMapping(value="/showUserInfo",method={RequestMethod.GET,RequestMethod.POST})
 	public  String showUserInfo(HttpServletRequest request,Model model) 
 	{
 		String email = request.getParameter("email");
@@ -447,7 +463,7 @@ public class UserMailController {
 		return "/user/userInfo";
 	}
 	
-	@RequestMapping(value="/changeUserPic",method=RequestMethod.POST)//使用两次就不抽象成函数了,更改数据库的
+	@RequestMapping(value="/changeUserPic",method={RequestMethod.GET,RequestMethod.POST})//使用两次就不抽象成函数了,更改数据库的
 	public  String changeUserPic(@RequestParam("file1") MultipartFile file,HttpServletRequest request,Model model) 
 	{
 		String email = request.getParameter("email");
@@ -478,7 +494,7 @@ public class UserMailController {
 		return "/user/userInfo";
 		
 	}
-	@RequestMapping(value="/logout",method=RequestMethod.GET)
+	@RequestMapping(value="/logout",method={RequestMethod.GET,RequestMethod.POST})
 	public String logout(HttpServletRequest request,HttpServletResponse response)
 	{
 		//清除Cookie
@@ -497,6 +513,45 @@ public class UserMailController {
 		}
 		//跳转到登录页面
 		return "user/preLogin";
+	}
+	@RequestMapping(value="/changeEmail",method={RequestMethod.GET,RequestMethod.POST})//更改邮箱
+	public  String changeEmail(HttpServletRequest request,Model model) 
+	{
+		String email = request.getParameter("email");
+		String newEmail = request.getParameter("newEmail");
+		String msg;
+		//判断输入的邮箱是否符合规则，前台也会校验
+		String regex = "\\w+@\\w+(\\.\\w{2,3})*\\.\\w{2,3}";
+		if(email.equals(newEmail))
+			msg = "两次绑定的邮箱相同";
+		if(!email.matches(regex) || !newEmail.matches(regex))
+		{
+			msg = "您的邮箱格式不正确请重新输入";
+		}
+		else//如果符合规则更新邮箱
+		{
+			//发送邮件到邮箱
+			String code = UUIDUtil.getUUID();
+			User temp = new User();
+			temp.setCode(code);
+			temp.setEmail(email);
+			//将激活码更新到用户表中
+			userService.updateUser(temp);
+			SendUtil.send(newEmail, 
+					"<h3><a href='http://www.menglingqiang.com/schedule/user/activation?flag=true&code="+code+"&email="+email+"&newEmail="+newEmail+"'>点击链接激活邮箱</a></h3>");
+			msg="请登录绑定邮箱邮箱激活";
+		}
+		//重新查询信息传给前台
+		User user = new User();
+		user.setEmail(email);
+		user = userService.queryByEmail(user);
+		int sum = projectService.queryAllDetailProjectCountByEmail(email);
+		int done = projectService.queryAllDoneDetailProjectCountByEmail(email);
+		model.addAttribute("sum",sum);
+		model.addAttribute("done",done);
+		model.addAttribute("user",user);
+		model.addAttribute("msg",msg);
+		return "/user/userInfo";
 	}
 	@RequestMapping("/test")
 	public String test()

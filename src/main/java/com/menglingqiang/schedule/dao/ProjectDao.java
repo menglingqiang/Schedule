@@ -28,4 +28,5 @@ public interface ProjectDao {
 	public int queryAllDetailProjectCountByEmail(String email);
 	public int queryAllDoneDetailProjectCountByEmail(String email);
 	public List<HashMap> queryMessage(String email);
+	public int updateProjectForEmailChange(Map map);
 }

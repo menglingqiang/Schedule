@@ -28,4 +28,8 @@ public interface UserService {
 	public int updateUserByUserIdForThree(Map map);
 	//查询第三方用户数据
 	public User queryUserByThree(Map map);
+	//用户和密码是否匹配
+	public int changeEmail(Map map);
+	//激活之后更新用户的邮箱
+	int updateUserEmail(Map map);
 }
