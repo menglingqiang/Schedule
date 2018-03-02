@@ -158,7 +158,7 @@
 			now() BETWEEN d.detail_start_time AND
 			DATE_ADD(d.detail_end_time,INTERVAL 1 DAY)  
 	</select>
-	<update id="updateProjectForEmailChange" parameterMap="java.util.HashMap">
+	<update id="updateProjectForEmailChange" parameterType="java.util.HashMap">
 		update user_info set email= #{newEmail}
 		where email=#{email}
 	</update>
