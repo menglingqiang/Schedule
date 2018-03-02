@@ -15,9 +15,9 @@ spring:
   profiles: dev
 
   datasource:
-    url: jdbc:mysql://39.106.167.50:3306/javamail?useUnicode=true&amp;characterEncoding=utf8
-    username: root
-    password: 123321
+    url: jdbc:mysql://yourIp/javamail?useUnicode=true&amp;characterEncoding=utf8
+    username: userName
+    password: password
     driver-class-name: com.mysql.jdbc.Driver
     # 使用druid数据源
     type: com.alibaba.druid.pool.DruidDataSource
