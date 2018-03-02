@@ -135,8 +135,7 @@ public class UserMailController {
 		int update =0;
 		if(loginType!=""&&loginType!=null&&userName!=""&&userName!=null)//是否传入数据
 		{
-			User user=null;
-			user = userService.queryUserByThree(map);//是否已经存在登录信息
+			User user  = userService.queryUserByThree(map);//是否已经存在登录信息
 			String email=null;
 			if(user==null)//没有用户
 			{
@@ -554,9 +553,14 @@ public class UserMailController {
 		return "/user/userInfo";
 	}
 	@RequestMapping("/test")
-	public String test()
+	public void test()
 	{
-		return "user/test2";
+		Map map = new HashMap<String,String>();
+		map.put("tempToken", "44444444444444444444444444444");
+		map.put("userName", "sdfsdfdsfds");
+		map.put("loginType", "1");
+		User user = userService.queryUserByThree(map);
+		System.out.println(user);
 	}
 }
 

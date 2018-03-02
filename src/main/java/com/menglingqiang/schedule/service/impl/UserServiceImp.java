@@ -77,10 +77,6 @@ public class UserServiceImp implements UserService{
 	}
 
 	@Override
-	public int changeEmail(Map map) {
-		return userDao.changeEmail(map);
-	}
-	@Override
 	public int updateUserEmail(Map map)
 	{
 		return userDao.updateUserEmail(map);

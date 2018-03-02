@@ -90,9 +90,5 @@
 		select * from user
 		where name=#{userName} and login_type=#{loginType}
 	</select>
-	<update id="changeEmail" parameterType="java.util.HashMap">
-		update user set email =#{newEmail}
-		where email =#{email}
-	</update>
 </mapper>
 

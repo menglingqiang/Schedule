@@ -18,6 +18,5 @@ public interface UserDao {
 	public int registerByThree(Map map);//通过第三方注册用户
 	public int updateUserByUserIdForThree(Map map);//通过第三方更新用户
 	public User queryUserByThree(Map map);//查询第三方用户数据
-	public int changeEmail(Map map);//更改邮箱
 	public int updateUserEmail(Map map);//更改邮箱
 }
