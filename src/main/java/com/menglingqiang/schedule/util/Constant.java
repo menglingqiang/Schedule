@@ -11,7 +11,7 @@ public class Constant {
 	//应用显示图标
 	public static final String WEBICO="panda.ico";
 	//发送用的邮箱
-	public static final String SENDEMAIL="1820026438@qq.com";
+	public static final String SENDEMAIL="1820026438@qq.co";
 	//发送用的邮箱授权码
 	public static final String SENDPASSWORD="upigsjirohopbfcd";
 	//发送的标题
