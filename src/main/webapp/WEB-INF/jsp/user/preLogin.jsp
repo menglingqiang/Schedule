@@ -5,6 +5,12 @@
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 String ico = Constant.WEBICO;
+
+String appIdLocal= Constant.APPIDLOCAL;
+String reUrlLocal =Constant.REURLLOCAL;
+
+String appIdNet= Constant.APPIDNET;
+String reUrlNet =Constant.REURLNET;
 %>
 <html>
 <head>
@@ -227,8 +233,8 @@ String ico = Constant.WEBICO;
         	<div class="bj_right">
             	<p>使用以下账号直接登录</p>
                 <a href="#" class="zhuce_qq">QQ登陆</a>
-			    <a id="weiboNet" href="https://api.weibo.com/oauth2/authorize?client_id=3566366953&response_type=code&redirect_uri=http://www.menglingqiang.com/schedule/user/registerByThree?loginType=2" class="zhuce_wb">微博登录</a>
-              	<a id="weiboLocal" href="https://api.weibo.com/oauth2/authorize?client_id=1179732476&response_type=code&redirect_uri=http://127.0.0.1:8080/schedule/user/registerByThree?loginType=2" class="zhuce_wb">微博本地</a>
+			    <a id="weiboNet" href="https://api.weibo.com/oauth2/authorize?client_id=<%=appIdLocal%>&response_type=code&redirect_uri=<%=reUrlLocal%>" class="zhuce_wb">微博登录</a>
+              	<a id="weiboLocal" href="https://api.weibo.com/oauth2/authorize?client_id=<%=appIdNet%>&response_type=code&redirect_uri=<%=reUrlNet%>" class="zhuce_wb">微博本地</a>
                <%-- <a href="<%=basePath %>user/loginByWeiBo" class="zhuce_wb">微博登陆</a>  --%>
                 <!-- <wb:login-button type="3,2" ></wb:login-button> -->
                 <a href="#" class="zhuce_wx">微信登陆</a>
