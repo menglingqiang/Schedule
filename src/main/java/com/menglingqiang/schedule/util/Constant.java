@@ -15,7 +15,7 @@ public class Constant {
 	//发送用的邮箱授权码
 	public static final String SENDPASSWORD="upigsjirohopbfcd";
 	//发送的标题
-	public static final String SENDTITLE="javaMail测试";
+	public static final String SENDTITLE="天天打卡任务提醒";
 	//邮箱注册用户
 	public static final String LOGINBYEMAIL="1";
 	//微博注册用户
