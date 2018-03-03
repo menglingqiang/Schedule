@@ -430,7 +430,7 @@ public class UserMailController {
 		user.setPassword(DigestUtils.md5DigestAsHex(password.getBytes()));
 		//查询是否有该用户
 		if(userService.queryByEmail(user)==null)
-			return "2"; 	
+			return "2"; 
 		//查询用户和密码是否正确，后期可以加密
 		if(userService.queryByPassword(user)==null)
 			return "3";
@@ -519,7 +519,7 @@ public class UserMailController {
 	@RequestMapping(value="/changeEmail",method={RequestMethod.GET,RequestMethod.POST})//更改邮箱
 	public  String changeEmail(HttpServletRequest request,Model model) 
 	{
-		String email = request.getParameter("email");
+ 		String email = request.getParameter("email");
 		String newEmail = request.getParameter("newEmail");
 		String msg;
 		//判断输入的邮箱是否符合规则，前台也会校验
@@ -554,6 +554,18 @@ public class UserMailController {
 		model.addAttribute("user",user);
 		model.addAttribute("msg",msg);
 		return "/user/userInfo";
+	}
+	@RequestMapping(value="/isBindEmail",method={RequestMethod.GET,RequestMethod.POST})
+	@ResponseBody
+	public boolean isBindEmail(HttpServletRequest request)
+	{
+		String email = request.getParameter("email");
+		User user = new User();
+		user.setEmail(email);
+		if(userService.queryByEmail(user)==null)
+			return false;
+		else
+			return true;
 	}
 	@RequestMapping("/test")
 	public void test()

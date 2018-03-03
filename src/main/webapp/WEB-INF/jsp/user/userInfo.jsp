@@ -46,7 +46,15 @@ String ico = Constant.WEBICO;
 	{
 		var newEmail = document.getElementById("newEmail").value;
 		if(!isEmail(email)||!isEmail(newEmail))
+		{
 			alert("邮箱格式不正确，请查看后重新提交");
+			return ;
+		}
+		if(isBindEmail(newEmail)=="true")
+		{
+			alert("此邮箱已经被绑定，请更换一个");
+			return ;
+		}
 		else
 		{
 			var form = document.getElementById("form1");
@@ -113,7 +121,22 @@ String ico = Constant.WEBICO;
             return true;
         }
         
-    }  
+    }
+	function isBindEmail(email)
+  	{
+  		var result;
+  		$.ajax({
+            type: "Get",
+            url: "<%=basePath%>user/isBindEmail?email="+email,
+            contentType: "application/json; charset=utf-8",
+            dataType: "text",
+            async: false,
+            success: function (data) {
+            	result= data;
+            }
+        });  
+  		return result;
+  	}
 	</script>
 </head>
 <body>
