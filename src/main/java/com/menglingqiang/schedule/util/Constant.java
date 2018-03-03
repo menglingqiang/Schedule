@@ -4,8 +4,8 @@ public class Constant {
 
 	//本地地址
 	//public static final String USERPICLOCALPATH="O:\\SpirngBoot\\schedule\\src\\main\\resources\\static\\userimg";
-	//public static final String USERPICLOCALPATH="/root/mlq/software/tomcat/tomcat8/apache-tomcat-8.5.24/webapps/schedule/WEB-INF/classes/static/userimg";
-	public static final String USERPICLOCALPATH="O:\\SpirngBoot\\schedule\\src\\main\\resources\\static\\userimg";
+	public static final String USERPICLOCALPATH="/root/mlq/software/tomcat/tomcat8/apache-tomcat-8.5.24/webapps/schedule/WEB-INF/classes/static/userimg";
+	//public static final String USERPICLOCALPATH="O:\\SpirngBoot\\schedule\\src\\main\\resources\\static\\userimg";
 	//服务器地址
 	public static final String SERVICELOCALPAHT="O:\\SpirngBoot\\schedule\\src\\main\\resources\\static\\userimg\\server";
 	//应用显示图标

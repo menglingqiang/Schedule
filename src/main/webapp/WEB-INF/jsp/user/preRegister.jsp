@@ -26,7 +26,7 @@ String reUrlNet =Constant.REURLNET;
 	    host = window.location.host;
 	    var weiboNet = document.getElementById("weiboNet");
 	    var weiboLocal = document.getElementById("weiboLocal");
-	    if(host.indexOf("www")==1)
+	    if(host.indexOf("www")!=-1)
 	    	weiboLocal.style.display="none";
 	    else
 	    	weiboNet.style.display="none";

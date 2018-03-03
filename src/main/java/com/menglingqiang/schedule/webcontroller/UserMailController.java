@@ -218,10 +218,13 @@ public class UserMailController {
 					user.setEmail(newEmail);
 				}
 				Project p = UUIDUtil.genProject(user.getEmail());
-				projectService.insertProjectByUser(user, p);//激活用户系统自动添加一项任务
+				if(newEmail==null)
+					projectService.insertProjectByUser(user, p);//激活用户系统自动添加一项任务
 				user.setStatus(1);
 				List<Project> projectList = projectService.queryProjectByEmail(user.getEmail());
 				model.addAttribute("projectList", projectList);//激活成功跳转到projectList界面
+				model.addAttribute("email", user.getEmail());//激活成功跳转到projectList界面
+				model.addAttribute("user", user);//激活成功跳转到projectList界面
 				return "fucktime/projectList"; 
 			}
 			model.addAttribute("user", user);

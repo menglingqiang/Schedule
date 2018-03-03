@@ -99,7 +99,7 @@ public class User {
 	@Override
 	public String toString() {
 		return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + ", code="
-				+ code + ", userPic=" + userPic + ", createTime=" + createTime + ", status=" + status + "]";
+				+ code + ", userPic=" + userPic + ", createTime=" + createTime + ", status=" + status + ", loginType=" + loginType + "]";
 	}
 
 }

@@ -14,7 +14,7 @@
     </select>
     
     <select id="queryByPassword" parameterType="com.menglingqiang.schedule.entity.User" resultType="com.menglingqiang.schedule.entity.User">
-    	select user_id,name,password,email,code,status,create_time
+    	select user_id,name,password,email,code,status,create_time,login_type
     	from user where email = #{email} and password = #{password}
     </select>
     
