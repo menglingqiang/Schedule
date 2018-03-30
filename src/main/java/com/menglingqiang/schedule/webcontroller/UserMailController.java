@@ -21,6 +21,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.ibatis.lang.UsesJava7;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.util.DigestUtils;
@@ -68,7 +69,7 @@ public class UserMailController {
 		return "user/preRegister";
 	}
 	//进入注册状态页面
-	@Transactional
+	@Transactional()
 	@RequestMapping(value="/register",method={RequestMethod.GET,RequestMethod.POST})
 	public String register(HttpServletRequest request,Model model,User user)
 	{
@@ -100,6 +101,7 @@ public class UserMailController {
 		String userName=null;
 		String userPic =null;
 		String accessToken = null;
+		String weiboUserId = null;
 		if(loginType.equals("2"))//如果是微博登录
 		{
 			String code = request.getParameter("code");
@@ -115,10 +117,10 @@ public class UserMailController {
 					String[] temp = uidStr.split("=");
 					if(temp.length<2)
 						return "user/login-errot";
-					String uid = temp[1];
+					weiboUserId = temp[1];
 					Users um = new Users(accessToken);
 				
-					weibo4j.model.User user = um.showUserById(uid);
+					weibo4j.model.User user = um.showUserById(weiboUserId);
 					userName = user.getScreenName();
 					userPic = user.getavatarLarge();
 					
@@ -132,6 +134,7 @@ public class UserMailController {
 		map.put("tempToken", accessToken);
 		map.put("userName", userName);
 		map.put("loginType", loginType);
+		map.put("threeUserId", weiboUserId);//微博的userId
 		int update =0;
 		if(loginType!=""&&loginType!=null&&userName!=""&&userName!=null)//是否传入数据
 		{

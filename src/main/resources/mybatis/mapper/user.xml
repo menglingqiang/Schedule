@@ -88,7 +88,7 @@
 	</update>
 	<select id="queryUserByThree" parameterType="java.util.HashMap" resultType="com.menglingqiang.schedule.entity.User">
 		select * from user
-		where name=#{userName} and login_type=#{loginType}
+		where three_user_id = #{threeUserId}
 	</select>
 </mapper>
 

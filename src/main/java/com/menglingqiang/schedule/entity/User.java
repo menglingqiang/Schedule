@@ -12,6 +12,15 @@ public class User {
 	private String userPic;
 	private String loginType;
 	private String tempToken;
+	private String threeUserId;
+	
+	public String getThreeUserId() {
+		return threeUserId;
+	}
+
+	public void setThreeUserId(String threeUserId) {
+		this.threeUserId = threeUserId;
+	}
 
 	public String getTempToken() {
 		return tempToken;

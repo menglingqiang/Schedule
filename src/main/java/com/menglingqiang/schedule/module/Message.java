@@ -1,5 +1,7 @@
 package com.menglingqiang.schedule.module;
 
+import org.assertj.core.internal.cglib.proxy.Enhancer;
+
 public class Message {
 
 	private String projectName;
