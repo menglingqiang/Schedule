@@ -58,6 +58,9 @@
 			<if test="code!=null and !&quot;&quot;.equals(code.trim())">
 	  			code=#{code},
 		    </if>
+			<if test="alertStatus!=null">
+				alert_status=#{alertStatus},
+			</if>
         </set>
 		where email = #{email}
 	</update>

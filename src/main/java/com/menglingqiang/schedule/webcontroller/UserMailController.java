@@ -16,12 +16,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.connector.Request;
 import org.apache.commons.io.FileUtils;
-import org.apache.ibatis.lang.UsesJava7;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.util.DigestUtils;
@@ -569,6 +566,19 @@ public class UserMailController {
 			return false;
 		else
 			return true;
+	}
+
+	@RequestMapping(value="/switchAlert",method={RequestMethod.GET,RequestMethod.POST})
+	@ResponseBody
+	public int switchAlert(HttpServletRequest request)
+	{
+		boolean alertStatus = Boolean.valueOf(request.getParameter("alertStatus"));
+		String email = request.getParameter("email");
+		User user = new User();
+		user.setEmail(email);
+		user.setAlertStatus(alertStatus);
+		int result = userService.updateUser(user);
+		return result;
 	}
 	@RequestMapping("/test")
 	public void test()

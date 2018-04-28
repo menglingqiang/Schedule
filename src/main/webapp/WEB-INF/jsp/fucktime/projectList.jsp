@@ -477,7 +477,7 @@ window.onload=function(){
 				<div class="rightCont">
 					<p class="g_title fix">总任务内容列表
 				     	<a class="btn03" href="<%=basePath%>user/logout">用户注销</a>
-				     	<a class="btn03" href="javascript:ShowDiv('MyAddDiv','fade','${user.email}','add','')">增加</a>
+						<a class="btn03" href="javascript:ShowDiv('MyAddDiv','fade','${user.email}','add','')">增加</a>
 						<!-- <a  class="btn03" href='javascript:shareWeiBo()'>微博分享</a> -->
 						<wb:share-button appkey="1179732476" addition="number" type="button"></wb:share-button>
 						<img class="btn03" id="checkImage" src="/schedule/img/message.jpg" style="width:30px;height:30px;" title="消息" onclick="javascript:message()"/>

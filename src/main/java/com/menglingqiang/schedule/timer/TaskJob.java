@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.menglingqiang.schedule.entity.User;
+import com.menglingqiang.schedule.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,10 @@ public class TaskJob {
 	private static final Logger logger = LoggerFactory.getLogger(App.class);
 	@Autowired
 	ProjectService projectService;
-	
+
+	@Autowired
+	UserService userService;
+
 	@Autowired
 	DetailProjectService detailProjectService;
 	
@@ -43,7 +48,10 @@ public class TaskJob {
 		for(int i=0;i<projectList.size();i++)
 		{
 			Project project = projectList.get(i);
-			if(checkEmail(project.getEmail()))
+			//todo 不改动接口的情况下怎么把它弄走
+			User user = new User();
+			user.setEmail(project.getEmail());
+			if(checkEmail(project.getEmail()) || userService.queryByEmail(user).getAlertStatus())
 				continue;
 			if(UUIDUtil.compareDate(today, project.getEndTime()))
 			{
@@ -72,6 +80,7 @@ public class TaskJob {
 		List<DetailProject> detailProjectList = detailProjectService.queryAllDetailProject();
 		HashMap<String,String> detailprojectMap = new HashMap<String,String>();
 		Date today = new Date();
+		User user = new User();
 		for(int i=0;i<detailProjectList.size();i++)
 		{
 			DetailProject detailProject = detailProjectList.get(i);
@@ -82,7 +91,8 @@ public class TaskJob {
 				Map<String,Object> temp = new HashMap<String,Object>();
 				temp.put("projectId", projectId);
 				String email = projectService.queryEverything(temp).get(0).getEmail();
-				if(checkEmail(email))
+				user.setEmail(email);
+				if(checkEmail(email) || userService.queryByEmail(user).getAlertStatus())
 					continue;
 				if(detailprojectMap.containsKey(email))//添加任务
 				{
