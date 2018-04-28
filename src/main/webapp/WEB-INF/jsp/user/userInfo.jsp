@@ -152,7 +152,7 @@ String ico = Constant.WEBICO;
 	        <li>
 	            <span>
 	               	邮箱 :${user.email}
-	               <input type="newEmail" id="newEmail" name="newEmail" placeholder="新绑定邮 箱"/>
+	               <input type="newEmail" id="newEmail" name="newEmail" placeholder="新绑定邮箱"/>
 	               <input type="button" value="提交" onclick="javascript:changeEmail('${user.email}')"></input>
 	            </span>
 	        </li>
@@ -168,6 +168,7 @@ String ico = Constant.WEBICO;
 	        </li>
 	       <li>
 	            <span>
+					<a href="<%=basePath%>user/switchAlert?alertStatus=false&email='${user.email}'">test_alert</a>
 	                	${msg}
 	            </span>
 	        </li>

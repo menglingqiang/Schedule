@@ -13,6 +13,15 @@ public class User {
 	private String loginType;
 	private String tempToken;
 	private String threeUserId;
+	private boolean alertStatus;
+
+	public boolean getAlertStatus() {
+		return alertStatus;
+	}
+
+	public void setAlertStatus(boolean alertStatus) {
+		this.alertStatus = alertStatus;
+	}
 	
 	public String getThreeUserId() {
 		return threeUserId;
@@ -105,10 +114,22 @@ public class User {
 		this.userPic = userPic;
 	}
 
+
 	@Override
 	public String toString() {
-		return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + ", code="
-				+ code + ", userPic=" + userPic + ", createTime=" + createTime + ", status=" + status + ", loginType=" + loginType + "]";
+		return "User{" +
+				"userId=" + userId +
+				", password='" + password + '\'' +
+				", name='" + name + '\'' +
+				", email='" + email + '\'' +
+				", code='" + code + '\'' +
+				", userPic='" + userPic + '\'' +
+				", loginType='" + loginType + '\'' +
+				", tempToken='" + tempToken + '\'' +
+				", threeUserId='" + threeUserId + '\'' +
+				", alertStatus=" + alertStatus +
+				", createTime=" + createTime +
+				", status=" + status +
+				'}';
 	}
-
 }

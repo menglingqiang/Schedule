@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import javafx.animation.Timeline;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,11 +23,8 @@ import com.menglingqiang.schedule.service.DetailProjectService;
 import com.menglingqiang.schedule.service.ProjectService;
 import com.menglingqiang.schedule.service.UserService;
 import com.menglingqiang.schedule.util.UUIDUtil;
-
-import weibo4j.Timeline;
 import weibo4j.model.Status;
 import weibo4j.model.WeiboException;
-
 
 
 @Controller
@@ -279,25 +277,25 @@ public class ProjectController {
     	model.addAttribute("messageList", messageList);
     	return "user/message";
     }
-    //微博分享
-    @RequestMapping(value="/shareWeiBo",method={RequestMethod.GET,RequestMethod.POST})
-    public  @ResponseBody String shareWeiBo(HttpServletRequest request)
-    {
-    	String email = request.getParameter("email");
-    	String text = request.getParameter("text");
-    	User temp = new User();
-    	temp.setEmail(email);
-    	User user = userService.queryByEmail(temp);
-    	String access_token = user.getTempToken();
-		Timeline tm = new Timeline(access_token);
-		try {
-			Status status = tm.updateStatus(text);
-		} catch (WeiboException e) {
-			e.printStackTrace();
-			return "error";
-		}	
-    	return "success";
-    }
+    //微博分享,微博关了,用用不了了,暂时用他提供的插件
+//    @RequestMapping(value="/shareWeiBo",method={RequestMethod.GET,RequestMethod.POST})
+//    public  @ResponseBody String shareWeiBo(HttpServletRequest request)
+//    {
+//    	String email = request.getParameter("email");
+//    	String text = request.getParameter("text");
+//    	User temp = new User();
+//    	temp.setEmail(email);
+//    	User user = userService.queryByEmail(temp);
+//    	String access_token = user.getTempToken();
+//		Timeline tm = new Timeline(access_token);
+//		try {
+//			Status status = tm.updateStatus(text);
+//		} catch (WeiboException e) {
+//			e.printStackTrace();
+//			return "error";
+//		}
+//    	return "success";
+//    }
     @RequestMapping(value="/test",method={RequestMethod.GET,RequestMethod.POST})
     public  String test(HttpServletRequest request,HttpServletResponse response,Model model)
     {
