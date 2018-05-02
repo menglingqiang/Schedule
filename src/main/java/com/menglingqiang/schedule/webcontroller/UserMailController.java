@@ -569,16 +569,24 @@ public class UserMailController {
 	}
 
 	@RequestMapping(value="/switchAlert",method={RequestMethod.GET,RequestMethod.POST})
-	@ResponseBody
-	public int switchAlert(HttpServletRequest request)
+	public String switchAlert(HttpServletRequest request,Model model)
 	{
 		boolean alertStatus = Boolean.valueOf(request.getParameter("alertStatus"));
 		String email = request.getParameter("email");
 		User user = new User();
 		user.setEmail(email);
 		user.setAlertStatus(alertStatus);
-		int result = userService.updateUser(user);
-		return result;
+		userService.updateUser(user);
+		//重新查询信息传给前台,封装一个函数?
+		user = userService.queryByEmail(user);
+		int sum = projectService.queryAllDetailProjectCountByEmail(email);
+		int done = projectService.queryAllDoneDetailProjectCountByEmail(email);
+		String msg = alertStatus ? "邮箱提醒开启成功!":"邮箱提醒关闭成功!";
+		model.addAttribute("sum",sum);
+		model.addAttribute("done",done);
+		model.addAttribute("user",user);
+		model.addAttribute("msg",msg);
+		return "/user/userInfo";
 	}
 	@RequestMapping("/test")
 	public void test()
