@@ -1,5 +1,6 @@
 <%@page contentType="text/html; charset=UTF-8" language="java" %>
 <%@page import="com.menglingqiang.schedule.util.Constant"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <%
 String path = request.getContextPath();
@@ -137,6 +138,21 @@ String ico = Constant.WEBICO;
         });  
   		return result;
   	}
+    function switchAlert(alertStatus,email)
+    {
+        var result;
+        $.ajax({
+            type: "Post",
+            url: "<%=basePath%>user/switchAlert?alertStatus="+alertStatus+"&email="+email,
+            contentType: "application/json; charset=utf-8",
+            dataType: "text",
+            async: false,
+            success: function (data) {
+                result= data;
+            }
+        });
+        return result;
+    }
 	</script>
 </head>
 <body>
@@ -166,10 +182,27 @@ String ico = Constant.WEBICO;
 	                	已完成任务量 :${done}
 	            </span>
 	        </li>
+           <c:if test="${msg!=null}">
+			   <li>
+	            <span>
+	                	${msg}
+	            </span>
+			   </li>
+		   </c:if>
 	       <li>
 	            <span>
-					<a href="<%=basePath%>user/switchAlert?alertStatus=false&email='${user.email}'">test_alert</a>
-	                	${msg}
+					<c:choose>
+						<c:when test="${user.alertStatus}">
+							<a href="javascript:switchAlert(false,'${user.email}');">
+								邮箱提醒已经开启,点击关闭
+							</a>
+						</c:when>
+						<c:otherwise>
+							<a href="javascript:switchAlert(true,'${user.email}');">
+								邮箱提醒已经关闭,点击开启
+							</a>
+						</c:otherwise>
+					</c:choose>
 	            </span>
 	        </li>
 	        <li>
