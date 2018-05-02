@@ -67,7 +67,8 @@ String ico = Constant.WEBICO;
         var reg = /^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$/;
         return reg.test(str);
     }
-    function PreviewImage(obj, imgPreviewId, divPreviewId) {  
+    function PreviewImage(obj, imgPreviewId, divPreviewId) {
+	    alert("选择完图片别忘了点上传,只选择文件是不会生效的!");
     	var extend=obj.value.substring(obj.value.lastIndexOf(".") + 1);
 		var msg = document.getElementById("message");
 		msg.innerHTML = '<font size="4px"  color="red" ></font>';//先清空一下信息
@@ -158,7 +159,7 @@ String ico = Constant.WEBICO;
 <body>
 	<form id="form1" action="" enctype="multipart/form-data" method="post">
 	<input type="hidden" value="${user.email}" id="email" name="email"/>
-	            <img src="/schedule/userimg/${user.userPic}" id="imgView" onclick="javascript:changeUserPic(${user.email})">
+	            <img src="/schedule/userimg/${user.userPic}" id="imgView" width="200" onclick="javascript:changeUserPic(${user.email})">
 	    <ul>
 	        <li>
 	            <span>
@@ -214,9 +215,8 @@ String ico = Constant.WEBICO;
 	    </ul>
 	
 	   <div>  
-	       <label >配图：</label>  
-	       <img id="imgView" src=""  alt="" />  
-	       <input type="button" value="上传" onclick="javascript:uploadUserPic(this)"/>
+	       <label >配图：</label>
+	       <input type="button" value="上传" style="background-color:#6fff72" onclick="javascript:uploadUserPic(this)"/>
 	       <input type="file" name="file1" id="file1" class="file"  value='浏览...' onchange="PreviewImage(this,'imgView','pic_preview')" />  
 	       <p id="message" name="message" ></p> 
     	</div>  

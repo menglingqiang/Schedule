@@ -480,8 +480,8 @@ window.onload=function(){
 						<a class="btn03" href="javascript:ShowDiv('MyAddDiv','fade','${user.email}','add','')">增加</a>
 						<!-- <a  class="btn03" href='javascript:shareWeiBo()'>微博分享</a> -->
 						<wb:share-button appkey="1179732476" addition="number" type="button"></wb:share-button>
-						<img class="btn03" id="checkImage" src="/schedule/img/message.jpg" style="width:30px;height:30px;" title="消息" onclick="javascript:message()"/>
-						<img class="btn03" id="checkImage" src="/schedule/img/userpic.jpg" style="width:30px;height:30px;" title="用户信息" onclick="javascript:userInfo()"/>
+						<img class="btn03" id="msgImg" src="/schedule/img/message.jpg" style="width:30px;height:30px;" title="消息" onclick="javascript:message()"/>
+						<img class="btn03" id="userImg" src="/schedule/img/userpic.jpg" style="width:30px;height:30px;" title="用户信息" onclick="javascript:userInfo()"/>
 				     </p>
 					<table class="tab1">
 						<tbody>
