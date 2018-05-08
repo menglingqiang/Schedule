@@ -598,5 +598,9 @@ public class UserMailController {
 		User user = userService.queryUserByThree(map);
 		System.out.println(user);
 	}
+	public void testCh()
+  {
+
+  }
 }
 
