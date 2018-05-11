@@ -599,10 +599,11 @@ public class UserMailController {
 	public  Boolean sendToKindle(@RequestParam("files") MultipartFile[] files,HttpServletRequest request)
 	{
 		ArrayList<String> books = new ArrayList<String>();
-		if(null != files) {
-			for(String book:books)
-				books.add(book);
-			return SendUtil.sendAttach(request.getParameter("kindleEmail"),books);
+		String to = request.getParameter("kindleEmail");
+		if(null != files && null!= to) {
+			for(MultipartFile file:files)
+				books.add(file.getName());
+			return SendUtil.sendAttach(to,books);
 		} else
 			return false;
 	}
