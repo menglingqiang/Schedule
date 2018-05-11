@@ -120,11 +120,11 @@ public class TaskJob {
 		//发送邮件
 		for(Entry<String,String> project:projectSet)
 		{
-			SendUtil.send((String)project.getKey(),(String)project.getValue());
+			SendUtil.sendString((String)project.getKey(),(String)project.getValue());
 		}
 		for(Entry<String,String> detailProject:detailProjectSet)
 		{
-			SendUtil.send((String)detailProject.getKey(),(String)detailProject.getValue());
+			SendUtil.sendString((String)detailProject.getKey(),(String)detailProject.getValue());
 		}
 	}
 	public static boolean checkEmail(String email)//是否是第三方默认邮箱

@@ -16,6 +16,8 @@ public class Constant {
 	public static final String SENDPASSWORD="upigsjirohopbfcd";
 	//发送的标题
 	public static final String SENDTITLE="天天打卡邮件提醒";
+	//发送的标题
+	public static final String SENDKINDLETITLE="convert";
 	//邮箱注册用户
 	public static final String LOGINBYEMAIL="1";
 	//微博注册用户

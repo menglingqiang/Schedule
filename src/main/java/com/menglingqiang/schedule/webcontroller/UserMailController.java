@@ -5,11 +5,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.Cookie;
@@ -84,7 +80,7 @@ public class UserMailController {
 		//1 注册成功，等待验证,跳到登录界面
 		{
 			//发送激活邮件给用户
-			SendUtil.send(email, 
+			SendUtil.sendString(email,
 			"<h1>点击链接激活邮箱</h1><h3><a href='http://www.menglingqiang.com/schedule/user/activation?flag=true&code="+code+"'>http://www.menglingqiang.com/schedule/user/activation?code="+code+"</a></h3>");
 			model.addAttribute("user",user);
 			return "user/login-success";
@@ -199,7 +195,7 @@ public class UserMailController {
 		else
 		{
 			if(!flag)//不是第一次注册，激活
-				SendUtil.send(user.getEmail(), 
+				SendUtil.sendString(user.getEmail(),
 					"<h3><a href='http://www.menglingqiang.com/schedule/user/activation?flag=true&code="+code+"'>点击链接激活邮箱</a></h3>");
 			else
 			{
@@ -376,7 +372,7 @@ public class UserMailController {
 		//TODO 修改信息，进入修改界面
 		String msg = "<h3><a href='http://www.menglingqiang.com/schedule/user/modifyPassword?email="+email+"&password="+password+"'>点击重置密码</a></h3>";
 		//发送邮件
-		SendUtil.send(email,msg);//点击连接，进入修改界面传入邮箱
+		SendUtil.sendString(email,msg);//点击连接，进入修改界面传入邮箱
 		request.getSession().setAttribute("msg", "邮件已经发送到您的邮箱，请查收");
 		return "user/confrimForgetPassword";
 	}
@@ -539,7 +535,7 @@ public class UserMailController {
 			temp.setEmail(email);
 			//将激活码更新到用户表中
 			userService.updateUser(temp);
-			SendUtil.send(newEmail, 
+			SendUtil.sendString(newEmail,
 					"<h3><a href='http://www.menglingqiang.com/schedule/user/activation?flag=true&code="+code+"&email="+email+"&newEmail="+newEmail+"'>点击链接激活邮箱</a></h3>");
 			msg="请登录绑定邮箱邮箱激活";
 		}
@@ -598,9 +594,17 @@ public class UserMailController {
 		User user = userService.queryUserByThree(map);
 		System.out.println(user);
 	}
-	public void testCh()
-  {
 
-  }
+	@RequestMapping(value="/kindle",method=RequestMethod.POST)
+	public  Boolean sendToKindle(@RequestParam("files") MultipartFile[] files,HttpServletRequest request)
+	{
+		ArrayList<String> books = new ArrayList<String>();
+		if(null != files) {
+			for(String book:books)
+				books.add(book);
+			return SendUtil.sendAttach(request.getParameter("kindleEmail"),books);
+		} else
+			return false;
+	}
 }
 
