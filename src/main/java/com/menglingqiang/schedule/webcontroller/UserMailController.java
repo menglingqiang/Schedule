@@ -12,12 +12,16 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.menglingqiang.schedule.module.ThridUser;
+import com.menglingqiang.schedule.module.WeiBoUser;
+import com.menglingqiang.schedule.module.WeiXinUser;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.util.DigestUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,14 +51,14 @@ public class UserMailController {
 	UserService userService;
 	@Autowired
 	ProjectService projectService;
-    
+
 	//欢迎页面
 	@RequestMapping(value="/",method={RequestMethod.GET,RequestMethod.POST})
 	public String welcome()
 	{
 		return "user/preLogin";//欢迎界面
 	}
-	
+
 	//进入注册页面
 	@RequestMapping(value="/preRegister",method={RequestMethod.GET,RequestMethod.POST})
 	public String preRegister()
@@ -75,7 +79,7 @@ public class UserMailController {
 		int temp = userService.register(user);
 		//0 注册失败
 		if(temp==0)
-			return "user/register-error"; 
+			return "user/register-error";
 		else
 		//1 注册成功，等待验证,跳到登录界面
 		{
@@ -93,43 +97,22 @@ public class UserMailController {
 		String loginType = request.getParameter("loginType");
 		String userName=null;
 		String userPic =null;
-		String accessToken = null;
-		String weiboUserId = null;
+		ThridUser thridUser =null;
+		Map map = new HashMap<String,String>();
+		String code = request.getParameter("code");
 		if(loginType.equals("2"))//如果是微博登录
 		{
-			String code = request.getParameter("code");
-			Oauth oauth = new Oauth();
-			if(code!=""&&code!=null)
-			{
-				try {
-					AccessToken token = oauth.getAccessTokenByCode(code);
-		            accessToken = token.getAccessToken() ;
-					String uidStr = UUIDUtil.token2Uid(token.toString());
-					if(uidStr==""||uidStr==null)
-						return "user/login-error";
-					String[] temp = uidStr.split("=");
-					if(temp.length<2)
-						return "user/login-errot";
-					weiboUserId = temp[1];
-					Users um = new Users(accessToken);
-				
-					weibo4j.model.User user = um.showUserById(weiboUserId);
-					userName = user.getScreenName();
-					userPic = user.getavatarLarge();
-					
-				} catch (WeiboException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			} 
-		}
-		Map map = new HashMap<String,String>();
-		map.put("tempToken", accessToken);
-		map.put("userName", userName);
+			thridUser = (WeiBoUser)loginByWeibo(code);
+			map.put("tempToken", ((WeiBoUser) thridUser).getTempToken());
+		}else if(loginType.equals("1"))
+			thridUser = loginByWeiXin(code);
+		if(thridUser==null)
+			return "user/login-error";
+		map.put("userName", thridUser.getUserName());
 		map.put("loginType", loginType);
-		map.put("threeUserId", weiboUserId);//微博的userId
+		map.put("threeUserId", thridUser.getUserId());//微博的userId
 		int update =0;
-		if(loginType!=""&&loginType!=null&&userName!=""&&userName!=null)//是否传入数据
+		if(!StringUtils.isEmpty(loginType) && !StringUtils.isEmpty(thridUser.getUserName()))//是否传入数据
 		{
 			User user  = userService.queryUserByThree(map);//是否已经存在登录信息
 			String email=null;
@@ -146,7 +129,7 @@ public class UserMailController {
 				//下载头像
 				UUIDUtil.downloadPic(userPic,Constant.USERPICLOCALPATH,userId+".jpg");
 				//UUIDUtil.downloadPic(userPic,Constant.SERVICELOCALPAHT,userId+".jpg");
-				
+
 				userService.updateUser(temp);//更新用户的头像，（用户头像名称）
 				update = userService.updateUserByUserIdForThree(map);
 				if(update!=1||init!=1)//注册第三方用户失败
@@ -170,7 +153,7 @@ public class UserMailController {
 				response.addCookie(emailCookie);
 				response.addCookie(passwordCookie);
 			}
-			
+
 			List<Project> projectList = projectService.queryProjectByEmail(user.getEmail());
 			model.addAttribute("projectList", projectList);
 			model.addAttribute("user", user);
@@ -221,7 +204,7 @@ public class UserMailController {
 				model.addAttribute("projectList", projectList);//激活成功跳转到projectList界面
 				model.addAttribute("email", user.getEmail());//激活成功跳转到projectList界面
 				model.addAttribute("user", user);//激活成功跳转到projectList界面
-				return "fucktime/projectList"; 
+				return "fucktime/projectList";
 			}
 			model.addAttribute("user", user);
 			//TODO跳转界面，发送成功请到邮箱激活
@@ -234,24 +217,45 @@ public class UserMailController {
 	{
 		return "user/preLogin";//登录界面
 	}
+
 	//微博登录
-	@RequestMapping(value="/loginByWeiBo",method={RequestMethod.GET,RequestMethod.POST})
-	public void loginByWeibo(HttpServletRequest request,HttpServletResponse response)
+	public WeiBoUser loginByWeibo(String code)
 	{
-		System.setProperty("java.awt.headless", "false");
 		Oauth oauth = new Oauth();
+		WeiBoUser weiBoUser = new WeiBoUser();
 		try {
-			BareBonesBrowserLaunch.openURL(oauth.authorize("code","","all"));//打开浏览器，后边可以做一个罩层
+			AccessToken token = oauth.getAccessTokenByCode(code);
+			String accessToken = token.getAccessToken() ;
+			String uidStr = UUIDUtil.token2Uid(token.toString());
+			if(StringUtils.isEmpty(uidStr))
+				return null;
+			String[] temp = uidStr.split("=");
+			if(temp.length<2)
+				return null;
+			weiBoUser.setUserId(temp[1]);
+			Users um = new Users(accessToken);
+			weibo4j.model.User user = um.showUserById(weiBoUser.getUserId());
+			weiBoUser.setUserName(user.getScreenName());
+			weiBoUser.setUserPicPath(user.getavatarLarge());
+			weiBoUser.setTempToken(accessToken);
 		} catch (WeiboException e) {
-			
 			e.printStackTrace();
+			weiBoUser=null;
+		}finally {
+			return weiBoUser;
 		}
+	}
+	//微信登录
+	public WeiXinUser loginByWeiXin(String code)
+	{
+
+		return null;
 	}
 	//执行登录逻辑
 	@RequestMapping(value="/login",method={RequestMethod.GET,RequestMethod.POST})
 	public String logIn(User user,Model model,HttpServletRequest request,HttpServletResponse response) throws IOException
 	{
-		//验证验证码是否输入正确	
+		//验证验证码是否输入正确
 		boolean codeFlag = false;
 		boolean autoLogin = (request.getParameter("autoLogin")!=null && request.getParameter("autoLogin")!="");
 		if(autoLogin==true)
@@ -265,7 +269,7 @@ public class UserMailController {
 			User userTemp = userService.queryByPassword(user);
 			if(userTemp==null)
 				return "user/login-error";//登录失败，后期可以显示是没有用户还是用户的密码错误
-			else 
+			else
 			{
 				model.addAttribute("user", userTemp);//传递用户的信息
 				//判断是否自动登录
@@ -275,7 +279,7 @@ public class UserMailController {
 					if(cookies!=null&&cookies.length>0)
 					{
 						//如果有中文，这里可以用URLEncoder放的之后编码，取得时候解码统一用utf-8
-						
+
 						Cookie emailCookie = new Cookie("email",userTemp.getEmail());
 						Cookie passwordCookie = new Cookie("password",userTemp.getPassword());
 						emailCookie.setMaxAge(60*60*24*10);//Cookie失效日期为十天
@@ -325,7 +329,7 @@ public class UserMailController {
 		char[] ch = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789".toCharArray();//
 		Random random = new Random();
 		StringBuffer sb = new StringBuffer();
-		
+
 		for(int i=0;i<4;i++)
 		{
 			int index = random.nextInt(ch.length);
@@ -342,7 +346,7 @@ public class UserMailController {
 	{
 		String picCode = (String)request.getSession().getAttribute("picCode");
 		picCode = picCode.trim();//去空格
-		
+
 		String inputCode = request.getParameter("inputCode").toUpperCase().trim();//不区分大小写
 		response.setContentType("text/html;charset=utf8");
 		boolean flag = picCode.equals(inputCode);
@@ -361,7 +365,7 @@ public class UserMailController {
 	{
 		return "user/preForgetPassword";
 	}
-	
+
 	//忘记密码逻辑,通过邮箱查找用户
 	@RequestMapping(value="/forgetPassword",method={RequestMethod.GET,RequestMethod.POST})
 	public String forgetPassword(User user,HttpServletRequest request)//前台会自动的将email注入到user中
@@ -400,7 +404,7 @@ public class UserMailController {
 		//TODO  动态sql写的有问题
 		if(flag!=1)
 			return "user/login-error";//界面直接登录
-		else 
+		else
 		{
 			user = userService.queryByEmail(user);
 			model.addAttribute("user", user);//传递用户的信息
@@ -418,7 +422,7 @@ public class UserMailController {
 	public @ResponseBody String loginFlag(HttpServletRequest request,HttpServletResponse response) throws IOException
 	{
 		//1验证成功，2这个邮箱木有注册，3有邮箱但是密码不对，4验证码不对
-		//验证验证码是否输入正确	
+		//验证验证码是否输入正确
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
 		User user = new User();
@@ -426,7 +430,7 @@ public class UserMailController {
 		user.setPassword(DigestUtils.md5DigestAsHex(password.getBytes()));
 		//查询是否有该用户
 		if(userService.queryByEmail(user)==null)
-			return "2"; 
+			return "2";
 		//查询用户和密码是否正确，后期可以加密
 		if(userService.queryByPassword(user)==null)
 			return "3";
@@ -441,15 +445,15 @@ public class UserMailController {
 		user.setEmail(email);
 		//查询是否有该用户
 		if(userService.queryByEmail(user)==null)
-			return "0"; 	
+			return "0";
 		else
 			return "1";
 	}
 	@RequestMapping(value="/showUserInfo",method={RequestMethod.GET,RequestMethod.POST})
-	public  String showUserInfo(HttpServletRequest request,Model model) 
+	public  String showUserInfo(HttpServletRequest request,Model model)
 	{
 		String email = request.getParameter("email");
-				
+
 		User temp = new User();
 		temp.setEmail(email);
 		User user = userService.queryByEmail(temp);//查询用户的信息
@@ -460,9 +464,9 @@ public class UserMailController {
 		model.addAttribute("done",done);
 		return "/user/userInfo";
 	}
-	
+
 	@RequestMapping(value="/changeUserPic",method={RequestMethod.GET,RequestMethod.POST})//使用两次就不抽象成函数了,更改数据库的
-	public  String changeUserPic(@RequestParam("file1") MultipartFile file,HttpServletRequest request,Model model) 
+	public  String changeUserPic(@RequestParam("file1") MultipartFile file,HttpServletRequest request,Model model)
 	{
 		String email = request.getParameter("email");
 		//String email = "13429774945@163.com";
@@ -471,7 +475,7 @@ public class UserMailController {
 		User user = userService.queryByEmail(temp);//查询用户的信息
 		String userPicName = user.getUserId() +"." +UUIDUtil.getFileType(file);//用户头像名称
 		temp.setUserPic(userPicName);
-		
+
 		if(!file.isEmpty()){
 			try {
 				FileUtils.copyInputStreamToFile(file.getInputStream(), new File(Constant.USERPICLOCALPATH,
@@ -490,7 +494,7 @@ public class UserMailController {
 		model.addAttribute("sum",sum);
 		model.addAttribute("done",done);
 		return "/user/userInfo";
-		
+
 	}
 	@RequestMapping(value="/logout",method={RequestMethod.GET,RequestMethod.POST})
 	public String logout(HttpServletRequest request,HttpServletResponse response)
@@ -513,7 +517,7 @@ public class UserMailController {
 		return "user/preLogin";
 	}
 	@RequestMapping(value="/changeEmail",method={RequestMethod.GET,RequestMethod.POST})//更改邮箱
-	public  String changeEmail(HttpServletRequest request,Model model) 
+	public  String changeEmail(HttpServletRequest request,Model model)
 	{
  		String email = request.getParameter("email");
 		String newEmail = request.getParameter("newEmail");
