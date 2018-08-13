@@ -8,6 +8,8 @@ import org.mockito.exceptions.verification.NoInteractionsWanted;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -23,6 +25,7 @@ import static org.mockito.Mockito.*;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class TestV1 {
+  private static final Logger logger = LoggerFactory.getLogger(TestV1.class);
   @Mock
   List mockList;
 
@@ -68,7 +71,8 @@ public class TestV1 {
   @Test
   public void deepstubsTest() {
     Account account = mock(Account.class, RETURNS_DEEP_STUBS);
-    when(account.getRailwayTicket().getDestination()).thenReturn("Beijing");
+    //when(account.getRailwayTicket().getDestination()).thenReturn("Beijing");
+    doReturn("ww").when(account).getRailwayTicket().getDestination();
     account.getRailwayTicket().getDestination();
     verify(account.getRailwayTicket()).getDestination();
     assertEquals("Beijing", account.getRailwayTicket().getDestination());
@@ -221,9 +225,9 @@ public class TestV1 {
   //https://www.cnblogs.com/Ming8006/p/6297333.html
 
   @Test
-  public void unstubbed_invocations(){
+  public void unstubbed_invocations() {
     //mock对象使用Answer来对未预设的调用返回默认期望值
-    List mock = mock(List.class,new Answer() {
+    List mock = mock(List.class, new Answer() {
       @Override
       public Object answer(InvocationOnMock invocation) throws Throwable {
         return 999;
@@ -232,11 +236,11 @@ public class TestV1 {
     //下面的get(1)没有预设，通常情况下会返回NULL，但是使用了Answer改变了默认期望值
     assertEquals(999, mock.get(1));
     //下面的size()没有预设，通常情况下会返回0，但是使用了Answer改变了默认期望值
-    assertEquals(999,mock.size());
+    assertEquals(999, mock.size());
   }
 
   @Test(expected = IndexOutOfBoundsException.class)
-  public void spy_on_real_objects(){
+  public void spy_on_real_objects() {
     List list = new LinkedList();
     List spy = spy(list);
     //下面预设的spy.get(0)会报错，因为会调用真实对象的get(0)，所以会抛出越界异常
@@ -249,47 +253,47 @@ public class TestV1 {
     //调用真实对象的api
     spy.add(1);
     spy.add(2);
-    assertEquals(100,spy.size());
-    assertEquals(1,spy.get(0));
-    assertEquals(2,spy.get(1));
+    assertEquals(100, spy.size());
+    assertEquals(1, spy.get(0));
+    assertEquals(2, spy.get(1));
     verify(spy).add(1);
     verify(spy).add(2);
-    assertEquals(999,spy.get(999));
+    assertEquals(999, spy.get(999));
     spy.get(2);
   }
 
   @Test
-  public void real_partial_mock(){
+  public void real_partial_mock() {
     //通过spy来调用真实的api
     List list = spy(new ArrayList());
-    assertEquals(0,list.size());
-    A a  = mock(A.class);
+    assertEquals(0, list.size());
+    A a = mock(A.class);
     //通过thenCallRealMethod来调用真实的api
     when(a.doSomething(anyInt())).thenCallRealMethod();
-    assertEquals(999,a.doSomething(999));
+    assertEquals(999, a.doSomething(999));
   }
 
 
-  class A{
-    public int doSomething(int i){
+  class A {
+    public int doSomething(int i) {
       return i;
     }
   }
 
   @Test
-  public void reset_mock(){
+  public void reset_mock() {
     List list = mock(List.class);
     when(list.size()).thenReturn(10);
     list.add(1);
-    assertEquals(10,list.size());
+    assertEquals(10, list.size());
     //重置mock，清除所有的互动和预设
     reset(list);
-    assertEquals(0,list.size());
+    assertEquals(0, list.size());
   }
 
 
   @Test
-  public void verifying_number_of_invocations(){
+  public void verifying_number_of_invocations() {
     List list = mock(List.class);
     list.add(1);
     list.add(2);
@@ -299,36 +303,38 @@ public class TestV1 {
     list.add(3);
     //验证是否被调用一次，等效于下面的times(1)
     verify(list).add(1);
-    verify(list,times(1)).add(1);
+    verify(list, times(1)).add(1);
     //验证是否被调用2次
-    verify(list,times(2)).add(2);
+    verify(list, times(2)).add(2);
     //验证是否被调用3次
-    verify(list,times(3)).add(3);
+    verify(list, times(3)).add(3);
     //验证是否从未被调用过
-    verify(list,never()).add(4);
+    verify(list, never()).add(4);
     //验证至少调用一次
-    verify(list,atLeastOnce()).add(1);
+    verify(list, atLeastOnce()).add(1);
     //验证至少调用2次
-    verify(list,atLeast(2)).add(2);
+    verify(list, atLeast(2)).add(2);
     //验证至多调用3次
-    verify(list,atMost(3)).add(3);
+    verify(list, atMost(3)).add(3);
   }
+
   @Test(expected = RuntimeException.class)
-  public void consecutive_calls(){
+  public void consecutive_calls() {
     //模拟连续调用返回期望值，如果分开，则只有最后一个有效
     when(mockList.get(0)).thenReturn(0);
     when(mockList.get(0)).thenReturn(1);
     when(mockList.get(0)).thenReturn(2);
     when(mockList.get(1)).thenReturn(0).thenReturn(1).thenThrow(new RuntimeException());
-    assertEquals(2,mockList.get(0));
-    assertEquals(2,mockList.get(0));
-    assertEquals(0,mockList.get(1));
-    assertEquals(1,mockList.get(1));
+    assertEquals(2, mockList.get(0));
+    assertEquals(2, mockList.get(0));
+    assertEquals(0, mockList.get(1));
+    assertEquals(1, mockList.get(1));
     //第三次或更多调用都会抛出异常
     mockList.get(1);
   }
+
   @Test
-  public void verification_in_order(){
+  public void verification_in_order() {
     List list = mock(List.class);
     List list2 = mock(List.class);
     list.add(1);
@@ -336,30 +342,32 @@ public class TestV1 {
     list.add(2);
     list2.add("world");
     //将需要排序的mock对象放入InOrder
-    InOrder inOrder = inOrder(list,list2);
+    InOrder inOrder = inOrder(list, list2);
     //下面的代码不能颠倒顺序，验证执行顺序
     inOrder.verify(list).add(1);
     inOrder.verify(list2).add("hello");
     inOrder.verify(list).add(2);
     inOrder.verify(list2).add("world");
   }
+
   @Test
-  public void verify_interaction(){
+  public void verify_interaction() {
     List list = mock(List.class);
     List list2 = mock(List.class);
     List list3 = mock(List.class);
     list.add(1);
     verify(list).add(1);
-    verify(list,never()).add(2);
+    verify(list, never()).add(2);
     //验证零互动行为
-    verifyZeroInteractions(list2,list3);
+    verifyZeroInteractions(list2, list3);
   }
+
   @Test(expected = NoInteractionsWanted.class)
-  public void find_redundant_interaction(){
+  public void find_redundant_interaction() {
     List list = mock(List.class);
     list.add(1);
     list.add(2);
-    verify(list,times(2)).add(anyInt());
+    verify(list, times(2)).add(anyInt());
     //检查是否有未被验证的互动行为，因为add(1)和add(2)都会被上面的anyInt()验证到，所以下面的代码会通过
     verifyNoMoreInteractions(list);
 
@@ -370,4 +378,37 @@ public class TestV1 {
     //检查是否有未被验证的互动行为，因为add(2)没有被验证，所以下面的代码会失败抛出异常
     verifyNoMoreInteractions(list2);
   }
+
+  @Test
+  public void testReturn() {
+    //mock出来的对象不论是when thenReturn还是doReturn when都不会真正的调用函数
+    //spy出来的对象when thenReturn会真的调用函数,doReturn when不会
+    // Animal a = spy(new Animal());
+    //when(a.eat()).thenReturn("he");
+    // doReturn("ere").when(a).eat();
+    //System.out.println(a.eat());
+    // Animal a = mock(Animal.class);
+
+//    Animal a = spy(new Animal());
+//    System.out.println(a);
+//    People people = spy(new People());
+//    when(people.test(any())).thenReturn("12345");
+//    System.out.println(people.test(a));
+  }
+
+  @Test
+  public void testMock() {
+    // Animal a = spy(new Animal());
+    Animal a = mock(Animal.class);
+    //when(a.speak()).thenReturn("jjjjj"); //执行方法拦截return,会走真实方法
+    doReturn("bbbb").when(a).speak();//匹配方法返回return,不会走真实方法
+    System.out.println(a.speak());
+//    People p = spy(new People());
+//    Animal a = mock(Animal.class);//animal把
+//    when(a.speak()).thenReturn("happy");
+//   // when(p.eat(any())).thenReturn("sad");
+//    System.out.println(p.eat(a));
+  }
+
+
 }
