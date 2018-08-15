@@ -3,13 +3,10 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatcher;
 import org.mockito.InOrder;
-import org.mockito.Mock;
 import org.mockito.exceptions.verification.NoInteractionsWanted;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -23,10 +20,9 @@ import static org.mockito.Mockito.*;
  * @author mlq
  * @date 2018/8/9
  */
+
 @RunWith(MockitoJUnitRunner.class)
 public class TestV1 {
-  private static final Logger logger = LoggerFactory.getLogger(TestV1.class);
-  @Mock
   List mockList;
 
   @Test
