@@ -308,6 +308,7 @@ public class UserMailController {
       String failCountStr = redisClient.get(key);
       Integer failCount = failCountStr == null ? 0 : Integer.valueOf(failCountStr) + 1;
       redisClient.set(key, failCount + "");
+      redisClient.setExpire(key, 3 * 60)
       boolean flag = failCount > 3 ? true : false;
       return flag;
     } catch (Exception e) {

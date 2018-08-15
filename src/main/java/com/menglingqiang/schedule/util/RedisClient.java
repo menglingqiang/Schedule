@@ -51,4 +51,13 @@ public class RedisClient<T> {
       jedis.close();
     }
   }
+  public void setExpire(String key,Integer expire)
+  {
+    Jedis jedis = null;
+    try {
+      jedis.expire(key,expire);
+    }finally {
+      jedis.close();
+    }
+  }
 }
