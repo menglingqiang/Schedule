@@ -1,8 +1,9 @@
 package com.menglingqiang.schedule.module;
 
-public class WeiBoUser extends ThridUser{
+public class WeiBoUser extends ThridUser {
 
   String tempToken;
+
   public String getTempToken() {
     return tempToken;
   }

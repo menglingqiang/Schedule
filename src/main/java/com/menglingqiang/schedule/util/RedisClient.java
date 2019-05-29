@@ -32,7 +32,7 @@ public class RedisClient<T> {
     Jedis jedis = null;
     try {
       jedis = jedisPool.getResource();
-      return  jedis.get(key);
+      return jedis.get(key);
     } finally {
       //返还到连接池
       jedis.close();
@@ -51,12 +51,12 @@ public class RedisClient<T> {
       jedis.close();
     }
   }
-  public void setExpire(String key,Integer expire)
-  {
+
+  public void setExpire(String key, Integer expire) {
     Jedis jedis = null;
     try {
-      jedis.expire(key,expire);
-    }finally {
+      jedis.expire(key, expire);
+    } finally {
       jedis.close();
     }
   }
