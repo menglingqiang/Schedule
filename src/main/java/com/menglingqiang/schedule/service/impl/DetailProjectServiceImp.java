@@ -26,7 +26,7 @@ public class DetailProjectServiceImp implements DetailProjectService{
 	@Override
 	public int deteleDetailProject(long projectDetailId) {
 		
-		return detailProjectDao.deteleDetailProject(projectDetailId);
+		return detailProjectDao.deleteDetailProject(projectDetailId);
 	}
 
 	@Override
